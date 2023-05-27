@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "TestSuite Configuration",
+    "type": "object",
+    "patternProperties": {
+        "^[A-Za-z0-9_-]*$": {
+            "type": ["object", "string"],
+            "properties": {
+                "ToExecute": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "const": "Yes",
+                            "description": "If you want to execute"
+                        },
+                        {
+                            "const": "No",
+                            "description": "If you don't want to execute"
+                        }
+                    ]
+                },
+                "TestSource": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "const": "Coded",
+                            "description": "If you want to proceed with C# coded tests"
+                        },
+                        {
+                            "const": "Scriptless",
+                            "description": "If you want to proceed with scriptless(JSON) type tests"
+                        }
+                    ]
+                },
+                "Suite": {
+                    "type": "array",
+                    "default": ["Regression"]
+                },
+                "DataKey": {
+                    "type": "string",
+                    "description": "Data key for mapping data driven test data sets"
+                }
+            },
+            "default": {
+                "ToExecute": "Yes",
+                "TestSource": "Scriptless",
+                "Suite": ["Regression"]
+            }        
+        }
+    }
+}

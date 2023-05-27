@@ -1,0 +1,9 @@
+{
+  "DELETE_Test_With_Parameters_Store_Test": {
+    "RequestType": "DELETE",
+    "SerialNo": 1,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/users/2",
+    "StatusCode": 204
+  }
+}

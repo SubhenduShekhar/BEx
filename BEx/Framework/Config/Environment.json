@@ -1,0 +1,19 @@
+{
+    "DEV": {
+        "BaseUrl": "https://dev.beatapps.net/"
+    },
+  "TEST": {
+    "BaseUrl": "https://reqres.in/",
+    "BaseUrl-1": "https://test.beatapps.net/",
+    "SubUrl": "aura/pod/services/docfeed/",
+    "SubUrl-Docfeed": "aura/pod/services/docfeed/",
+    "SubUrl-FinData": "aura/pod/services/financialsdatamanager/",
+    "SubUrl-WM": "WorkflowMgmt/pod/WorkflowMgmt/",
+    "client_id": "beat_aura_test",
+    "scope": "beat-covenant-pulse-api-pod-resource-id beat-financialsdata-manager-client-id_api beat-docfeed-service-api-client-id_api beat-taxonomy-service-api-client-id_api beat-company-details-api-pod-resource-id beat-auth-permission-management-api-pod-resource-id beat-alexandria-test-api-resource-id beat-ids-wrapper-api-pod-resource-id auth-admin-client-id_api beat-workflow-management-api-pod-resource-id",
+    "grant_type": "client_credentials"
+  },
+    "UAT": {
+        "BaseUrl": "https://uat.beatapps.net/"
+    }
+}

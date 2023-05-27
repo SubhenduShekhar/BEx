@@ -1,0 +1,13 @@
+﻿{
+  "SerialNo": 1,
+  "EndPoint": "[from-env:BaseUrl]api/users/2",
+  "StatusCode": 200,
+  "ReportResponse": true,
+  "Store": [
+    {
+      "name": "response:root.name"
+    }
+  ],
+  "Expected": [ "Hello", "World" ],
+  "CustomCode": "[from-file:Codes\\Code.txt]"
+}

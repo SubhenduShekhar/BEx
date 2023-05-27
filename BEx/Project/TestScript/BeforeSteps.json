@@ -1,0 +1,24 @@
+{
+  "GET_Test_With_Parameters_Store_Test": {
+    "RequestType": "GET",
+    "SerialNo": 1,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/[from-file:Endpoint\\GET_Test_With_Parameters_Store_Test.txt]",
+    "Parameters": {
+      "from-file": "Parameters\\GET_GET_Test_With_Parameters_Store_Test.json"
+    },
+    "StatusCode": 200,
+    "Loop": {
+      "Condition": "this.StatusCode==200",
+      "Count": "5"
+    },
+    "ReportResponse": true,
+    "Validate": [ "response:root.page" ],
+    "Expected": [ "2" ],
+    "Store": [
+      {
+        "page": "response:root.page"
+      }
+    ]
+  }
+}

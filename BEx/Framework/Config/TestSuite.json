@@ -1,0 +1,31 @@
+﻿{
+  "Before": "BeforeSteps",
+  "GET": {
+    "ToExecute": "Yes",
+    "TestSource": "Scriptless",
+    "Suite": [ "Regression" ],
+    "DataKey": "GetCase"
+  },
+  "POST": {
+    "ToExecute": "Yes",
+    "TestSource": "Scriptless",
+    "Suite": [ "Regression" ],
+    "DataKey": "PostCase"
+  },
+  "PUT": {
+    "ToExecute": "Yes",
+    "TestSource": "Scriptless",
+    "Suite": [ "Regression" ],
+    "DataKey": "PutCase"
+  },
+  "DELETE": {
+    "ToExecute": "Yes",
+    "TestSource": "Scriptless",
+    "Suite": [ "Regression" ]
+  },
+  "CodedScript": {
+    "ToExecute": "Yes",
+    "TestSource": "Coded",
+    "Suite": [ "Regression" ]
+  }
+}

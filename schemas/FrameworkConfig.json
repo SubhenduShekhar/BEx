@@ -1,0 +1,84 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Framework base configuration",
+    "type": "object",
+    "properties": {
+        "DataFilePath": {
+            "type": "string",
+            "description": "Path for test data with file name/ test file directory. Can be abosolute or relative. This is not required if your project is fully scriptless as test data is passed from TestCase.json file. Although if you are giving test file directory, also mention TestDataFormat",
+            "default": "Project\\Datatable"
+        },
+        "TestDataFormat": {
+            "type": "string",
+            "description": "File extension(for excel, only .xlsx file is supported)",
+            "default": ""
+        },
+        "TestSuiteConfig": {
+            "type": "string",
+            "description": "Location of test suite config file. Can be abosolute or relative. Only JSON files in provided sample format is accepted.",
+            "default": "Framework\\Config\\TestSuite.json"
+        },
+        "TestCasePath": {
+            "type": "string",
+            "description": "Location of test scripts. Can be abosolute or relative. Only JSON files for scriptless in provided format is accepted.",
+            "default": ".\\Project\\TestScript\\"
+        },
+        "SlackNotify": {
+            "type": "boolean",
+            "description": "Set true if you want to enable notification of execution results in slack channel. Optional parameter",
+            "default": true
+        },
+        "ProjectName": {
+            "type": "string",
+            "description": "Requried if SlackNotify is true. Project name",
+            "default": ""
+        },
+        "WebHookUrl": {
+            "type": "string",
+            "description": "Requried if SlackNotify is true.",
+            "default": ""
+        },
+        "Environment": {
+            "type": "string",
+            "description": "Default framework environment",
+            "default": "TEST"
+        },
+        "Tag": {
+            "type": "array",
+            "description": "Person you want to notify specially in slack. Will be tagged as @user.name",
+            "default": "@kanika.goyal"
+        },
+        "RunLocation": {
+            "type": "string",
+            "anyOf": [
+                {
+                    "const": "LOCAL",
+                    "description": "For local executions"
+                },
+                {
+                    "const": "PIPELINE",
+                    "description": "For pipeline executions"
+                }
+            ],
+            "description": "Default framework environment",
+            "default": "TEST"
+        },
+        "ApiLibraryPath": {
+            "type": "string",
+            "description": "Api library path for API segregation",
+            "default": "ApiLibrary"
+        }
+    },
+    "required": ["DataFilePath", 
+        "TestDataFormat", 
+        "TestSuiteConfig",
+        "TestCasePath",
+        "Environment",
+        "ProjectName"
+    ],
+    "dependencies": {
+        "SlackNotify": {
+            "required": ["RunLocation", "Tag"]
+        }
+    }
+}

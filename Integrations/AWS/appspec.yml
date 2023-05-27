@@ -1,0 +1,10 @@
+version: 0.0 
+os: windows
+files:
+  - source: \
+    destination: C:\inetpub\wwwroot\Aura\Api\
+hooks:
+   BeforeInstall:
+    - location: .\BeforeInstall.ps1
+   AfterInstall:
+    - location: .\Install.ps1

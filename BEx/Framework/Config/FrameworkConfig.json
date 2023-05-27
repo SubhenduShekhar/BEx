@@ -1,0 +1,12 @@
+﻿{
+  "DataFilePath": ".\\BEx\\Project\\Datatable\\",
+  "TestDataFormat": "xlsx",
+  "TestSuiteConfig": ".\\Framework\\Config\\TestSuite.json",
+  "TestCasePath": ".\\Project\\TestScript\\",
+  "Environment": "TEST",
+  "ApiLibraryPath": "ApiLibrary",
+  "ProjectName": "BEx unit tests",
+  "SlackNotify": true,
+  "Tag": [ "@kanika.goyal" ],
+  "RunLocation": "Local"
+}

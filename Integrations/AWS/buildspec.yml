@@ -1,0 +1,15 @@
+version: 0.2
+phases:
+    build:
+        commands:
+            - dir
+artifacts:
+    files:
+        - Framework/**/*
+        - libs/*
+        - Project/**/*
+        - buildspec.yml
+        - appspec.yml
+        - run.bat
+        - BeforeInstall.ps1
+        - Install.ps1

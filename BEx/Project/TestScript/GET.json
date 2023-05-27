@@ -1,0 +1,55 @@
+{
+  "GET_Test_With_Parameters_Store_Test": {
+    "RequestType": "GET",
+    "SerialNo": 1,
+    "ToExecute": "No",
+    "EndPoint": "[from-env:BaseUrl]api/[from-file:Endpoint\\GET_Test_With_Parameters_Store_Test.txt]",
+    "Parameters": {
+      "from-file": "Parameters\\GET_GET_Test_With_Parameters_Store_Test.json"
+    },
+    "StatusCode": 200,
+    "Loop": {
+      "Condition": "this.StatusCode==200",
+      "Count": "5"
+    },
+    "ReportResponse": true,
+    "Validate": [ "response:root.page" ],
+    "Expected": [ "2" ],
+    "Store": [
+      {
+        "page": "response:root.page"
+      }
+    ]
+  },
+  "GET_Test_Without_Parameters": {
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "SerialNo": 2,
+    "ReportResponse": true
+  },
+  "GET_Test_With_Parameters_Fetch_Test": {
+    "RequestType": "GET",
+    "SerialNo": 3,
+    "ToExecute": "No",
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "Parameters": {
+      "page": "[Fetch:page]"
+    },
+    "StatusCode": 200,
+    "ReportResponse": true
+  },
+  "GET_File_Download_Ensure": {
+    "RequestType": "GET",
+    "SerialNo": 4,
+    "ToExecute": "Yes",
+    "EndPoint": "https://api.github.com/repos/MAKnowledgeServices/BATA-Framework/releases/assets/56264911",
+    "Headers": {
+      "Authorization": "token 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",
+      "Accept": "application/octet-stream",
+      "User-Agent": "HttpClient"
+    },
+    "StatusCode": 200,
+    "ReportResponse": true,
+    "DownloadFileAs": "AWS.zip",
+    "EnsureFile": true
+  }
+}

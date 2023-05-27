@@ -1,0 +1,16 @@
+﻿{
+  "RequestType": "PUT",
+  "SerialNo": 3,
+  "ToExecute": "Yes",
+  "EndPoint": "[from-env:BaseUrl]api/users",
+  "Payload": {
+    "name": "morpheus",
+    "job": "zion resident"
+  },
+  "Header": {
+    "from-file": "Headers\\PUT_app-json_from-env_from_file_header_store.json"
+  },
+  "StatusCode": 200,
+  "ReportResponse": true,
+  "ShowPayload": true
+}

@@ -1,0 +1,167 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "Test case configuration",
+    "type": "object",
+    "patternProperties": {
+        "^[A-Za-z0-9_-]*$": {
+            "type": ["object", "array"],
+            "properties": {
+                "ToExecute": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "const": "Yes",
+                            "description": "If you want to execute"
+                        },
+                        {
+                            "const": "No",
+                            "description": "If you don't want to execute"
+                        }
+                    ]
+                },
+                "SerialNo": {
+                    "type": "number",
+                    "description": "Execution sequence"
+                },
+                "StatusCode": {
+                    "type": "number",
+                    "description": "Expected status code after api call",
+                    "default": 200
+                },
+                "Headers": {
+                    "type": "object",
+                    "description": "Request header in key value pair. Framework default: application/json",
+                    "default": {
+                        
+                    },
+                    "patternProperties": {
+                        "^[A-Za-z0-9_-]*$": {
+                            "type": "string",
+                            "default": "",
+                            "description": "You can use any of these: [Fetch:<JSONPath_TO_VARIABLE>], from-file:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, to-file:<REQUEST/RESPONSE>:<JSONPath_TO_VARIABLE>, raw-response:root"
+                        }
+                    }
+                },
+                "RequestType": {
+                    "type": "string",
+                    "oneOf": [
+                        {
+                            "const": "GET",
+                            "description": "GET call"
+                        },
+                        {
+                            "const": "POST",
+                            "description": "POST call"
+                        },
+                        {
+                            "const": "PATCH",
+                            "description": "PATCH call"
+                        },
+                        {
+                            "const": "PUT",
+                            "description": "PUT call"
+                        },
+                        {
+                            "const": "DELETE",
+                            "description": "DELETE call"
+                        }
+                    ]
+                },
+                "EndPoint": {
+                    "type": "string",
+                    "description": "You can use any of these: [Fetch:<JSONPath_TO_VARIABLE>], from-file:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, [from-env:]",
+                    "default": ""
+                },
+                "Payload": {
+                    "type": "object",
+                    "description": "Request payload. Only required if request method is POST, PUT",
+                    "default": {
+                        
+                    },
+                    "patternProperties": {
+                        "^[A-Za-z0-9_-]*$": {
+                            "type": "string",
+                            "default": "",
+                            "description": "You can use any of these: [Fetch:<JSONPath_TO_VARIABLE>], upload-file:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, from-file:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, from-code:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, to-file:<REQUEST/RESPONSE>:<JSONPath_TO_VARIABLE>, raw-response:root, RandomName(length), GetDate(DateFormat)"
+                        }
+                    }
+                },
+                "ReportResponse": {
+                    "type": "boolean",
+                    "description": "Set true if you want to report the incoming response payload to reports file"
+                },
+                "Store": {
+                    "type": "array",
+                    "description": "Stores data fetching from request/response payload",
+                    "properties": {
+                        "^[A-Za-z0-9_-]*$": {
+                            "type": "string"
+                        }
+                    },
+                    "default": [
+                        {}
+                    ]
+                },
+                "Validate": {
+                    "type": "array",
+                    "description": "Array of json path to validate fields with respect to Expected key",
+                    "default": []
+                },
+                "Expected": {
+                    "type": "array",
+                    "description": "Array of expected values",
+                    "default": []
+                },
+                "Parameters": {
+                    "type": "object",
+                    "description": "Parameters to send in endpoint",
+                    "default": {
+
+                    },
+                    "patternProperties": {
+                        "^[A-Za-z0-9_-]*$": {
+                            "type": "string",
+                            "default": "",
+                            "description": "You can use any of these: [Fetch:<JSONPath_TO_VARIABLE>], upload-file:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, from-file:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, from-code:<PATH/TO/FILE/RELATIVE/TO/DataFilePath>, to-file:<REQUEST/RESPONSE>:<JSONPath_TO_VARIABLE>, raw-response:root, RandomName(length), GetDate(DateFormat)"
+                        }
+                    }
+                },
+                "ShowPayload": {
+                    "type": "boolean",
+                    "description": "Set true if you want to monitor the generated payload",
+                    "default": false
+                },
+                "CustomCode": {
+                    "type": "string",
+                    "description": "You can put raw code here. Or you can use [from-file:...]",
+                    "default": "[from-file:YOUR/FILE/PATH.extension]"
+                },
+                "Loop": {
+                    "type": "object",
+                    "description": "You can execute apis in loops with condition and max loop count",
+                    "default": {
+                        "Condition": "",
+                        "Count": 10
+                    }
+                },
+                "DownloadFileAs": {
+                    "type": "string",
+                    "description": "WARNING: When this key is provided, your call will be treated as a download file api request.",
+                    "default": "FileName.ext"
+                },
+                "EnsureFile": {
+                    "type": "boolean",
+                    "description": "Validates whether the file is downloaded successfully",
+                    "default": true
+                }
+            },
+            "default": {
+                "ToExecute": "Yes",
+                "SerialNo": 0,
+                "StatusCode": 200,
+                "RequestType": "GET",
+                "EndPoint": "[from-env:BaseUrl]documents/api/Document"
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+﻿{
+  "RequestType": "PUT",
+  "SerialNo": 2,
+  "ToExecute": "Yes",
+  "EndPoint": "[from-env:BaseUrl]api/users/2",
+  "Payload": {
+    "from-file": "Payloads\\PUT_from-env_simple_payload_store.json"
+  },
+  "StatusCode": 200,
+  "ReportResponse": true,
+  "ShowPayload": true
+}

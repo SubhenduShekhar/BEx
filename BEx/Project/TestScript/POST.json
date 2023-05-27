@@ -1,0 +1,82 @@
+{
+  "POST_app-json_from-env_simple_payload_store": {
+    "RequestType": "POST",
+    "SerialNo": 1,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "Payload": {
+      "name": "morpheus",
+      "job": "leader"
+    },
+    "StatusCode": 201,
+    "ReportResponse": true,
+    "Store": [
+      {
+        "name": "response:root.name"
+      }
+    ],
+    "CustomCode": "[from-file:Codes/Code.txt]",
+    "Expected": [ "hello" ]
+  },
+  "POST_app-json_from-env_from_file_payload_store": {
+    "RequestType": "POST",
+    "SerialNo": 2,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "Payload": {
+      "name": "[Fetch:name]",
+      "job": "leader",
+      "value": "[from-file:Payloads\\POST_from-env_simple_payload_store.json]"
+    },
+    "StatusCode": 201,
+    "ReportResponse": true,
+    "ShowPayload": true
+  },
+  "POST_app-json_from-env_from_file_header_store": {
+    "RequestType": "POST",
+    "SerialNo": 3,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "Payload": {
+      "name": "morpheus",
+      "job": "leader"
+    },
+    "Store": [
+      {
+        "job": "request:root.job"
+      }
+    ],
+    "Header": {
+      "from-file": "Headers\\POST_app-json_from-env_from_file_header_store.json"
+    },
+    "StatusCode": 201,
+    "ReportResponse": true,
+    "ShowPayload": true
+  },
+  "POST_app-json_from-code_payload_store": {
+    "RequestType": "POST",
+    "SerialNo": 4,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "Payload": {
+      "from-code": "Codes\\POST_app-json_from-code_payload_store.txt"
+    },
+    "StatusCode": 201,
+    "ReportResponse": true,
+    "ShowPayload": true
+  },
+  "POST_app-json_from-code_sub-payload_store": {
+    "RequestType": "POST",
+    "SerialNo": 5,
+    "ToExecute": "Yes",
+    "EndPoint": "[from-env:BaseUrl]api/users",
+    "Payload": {
+      "name": "[from-code:Codes\\POST_app-json_from-code_sub-payload_store.txt]",
+      "job": "leader",
+      "curdate": "GetDate(\"dddd, dd MMMM yyyy\")"
+    },
+    "StatusCode": 201,
+    "ReportResponse": true,
+    "ShowPayload": true
+  }
+}
