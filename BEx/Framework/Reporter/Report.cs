@@ -12,6 +12,16 @@ namespace BEx.Framework.Reporter
     {
         private String TestCaseName { get; set; }
         private static Boolean ToReport { get; set; } = true;
+
+        public static Report reportObj = null;
+        public static Report reportInstance
+        {
+            get {
+                if (reportObj == null)
+                    reportObj = new Report();
+                return reportObj;
+            }
+        }
         public enum Status
         {
             Pass = 1,
@@ -23,7 +33,6 @@ namespace BEx.Framework.Reporter
         }
         public static AventStack.ExtentReports.ExtentReports Extent { get; set; }
         public ExtentTest Test { get; set; }
-
         private static FileStream fileStream { get; set; }
         public Report(Boolean ToReport = true)
         {
