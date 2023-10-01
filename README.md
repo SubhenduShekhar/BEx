@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/MAKnowledgeServices/BATA-Framework/blob/main/images/logo.PNG?raw=true" alt="logo"><br/>
+<img src="https://raw.githubusercontent.com/SubhenduShekhar/BEx/main/images/logo.PNG" alt="logo"><br/>
 </p>
 
 
@@ -39,12 +39,12 @@
 - [Credits](#credits)
 
 ## Introduction
-Thank you for using BATA framework for your automation. In the next list of items, you will be walked through
+Thank you for using BEx framework for your automation. In the next list of items, you will be walked through
 things, which we have felt amazing while developing also.
 
 ## Project Folder Structure
 
-├─── BATA<br/>
+├─── BEx<br/>
 ├   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─── Framework<br/>
 ├   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   └─── Config<br/>
 ├   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─── `FrameworkConfig.json` and `TestSuite.json`<br/>
@@ -59,7 +59,7 @@ Please follow the below steps to get onboarded to the framework:
 1. Create a Console Framework for .NET application
 2. Download the latest framework release from framework repository
 3. In Project -> Dependencies -> Browser -> Browser
-4. Browse `BATA.dll` files and add to your project
+4. Browse `BEx.dll` files and add to your project
 5. Configure Framework/Config/FrameworkConfig.json. For more details, click [here](#configuring-frameworkconfigjson)
 
 ### Coded
@@ -74,7 +74,7 @@ Please follow the below steps to get onboarded to the framework:
 1. Configure TestSuite.json file. For more details click [here](#configuring-testsuitejson)
 2. Add your test case files in `Project/TestScipts/` location.
 3. Write your test cases. For more details, click [here](#scriptless-2)
-4. Run your tests by running `BATA.exe` file in your build folder.
+4. Run your tests by running `BEx.exe` file in your build folder.
 
 ## Project Configurations
 
@@ -114,12 +114,12 @@ Please follow the below steps to get onboarded to the framework:
             <td width=20%>String</td>
             <td width=35%>Location of test suite config file. Can be abosolute or relative. Only JSON files in provided sample format is accepted.
             </td>
-            <td width=40%>C:\\Users\\username\\Desktop\\ProjectName\\BATA\\Framework\\Config\\TestSuite.json<br/>
-            C:/Users/username/Desktop/ProjectName/BATA/Framework/Config/TestSuite.json<br/>
-            .\\BATA\\Framework\\Config\\TestSuite.json<br/>
-            ./BATA/Framework/Config/TestSuite.json<br/>
-            BATA\\Framework\\Config\\TestSuite.json<br/>
-            BATA/Framework/Config/TestSuite.json</td>
+            <td width=40%>C:\\Users\\username\\Desktop\\ProjectName\\BEx\\Framework\\Config\\TestSuite.json<br/>
+            C:/Users/username/Desktop/ProjectName/BEx/Framework/Config/TestSuite.json<br/>
+            .\\BEx\\Framework\\Config\\TestSuite.json<br/>
+            ./BEx/Framework/Config/TestSuite.json<br/>
+            BEx\\Framework\\Config\\TestSuite.json<br/>
+            BEx/Framework/Config/TestSuite.json</td>
         </tr>
         <tr>
             <td width=5%>TestCasePath</td>
@@ -185,7 +185,7 @@ Below are custom examples for `coded` and `scriptless` scripting styles
 {
   "DataFilePath": "Project\\TestData\\TestData.xlsx",
    "TestDataFormat": "",
-  "TestSuiteConfig": ".\\BATA\\Framework\\Config\\TestSuite.json",
+  "TestSuiteConfig": ".\\BEx\\Framework\\Config\\TestSuite.json",
   "TestCasePath": ".\\Project\\TestScript\\"
 }
 ```
@@ -195,7 +195,7 @@ Below are custom examples for `coded` and `scriptless` scripting styles
 {
   "DataFilePath": "Project\\TestData\\",
    "TestDataFormat": "Excel",
-  "TestSuiteConfig": ".\\BATA\\Framework\\Config\\TestSuite.json",
+  "TestSuiteConfig": ".\\BEx\\Framework\\Config\\TestSuite.json",
   "TestCasePath": ".\\Project\\TestScript\\"
 }
 ```
@@ -205,7 +205,7 @@ Below are custom examples for `coded` and `scriptless` scripting styles
 {
   "DataFilePath": "Project\\TestData\\",
    "TestDataFormat": "",
-  "TestSuiteConfig": ".\\BATA\\Framework\\Config\\TestSuite.json",
+  "TestSuiteConfig": ".\\BEx\\Framework\\Config\\TestSuite.json",
   "TestCasePath": ".\\Project\\TestScript\\"
 }
 ```
@@ -305,7 +305,7 @@ To fetch data from specific environment:
 
 1. Create test cases in the specified path in `FrameworkConfig.json` file.
 2. Add new class file with name `TestCaseName.cs`.
-3. Inherit `BATA.Framework.Base.ITestCaseBase` and implement all the methods.
+3. Inherit `BEx.Framework.Base.ITestCaseBase` and implement all the methods.
 4. Below is the format you should expect:
 ```
 public void AfterSuite(Data data)
@@ -850,19 +850,19 @@ And atleast, change the TestCase file content from above to:
 ## Commandline options
 
 ### --tests=<Comma,Seperated,Tests>
-If you want to run specific test cases, you can provide the test case name as command line arguments to `BATA.exe`.<br/>
+If you want to run specific test cases, you can provide the test case name as command line arguments to `BEx.exe`.<br/>
 The format for providing argument is provided below:
 
-`BATA --tests=TC001`
+`BEx --tests=TC001`
 
 If more than 1 test cases are to be provided, you can append them as comma seperated values. Below is the format:
 
-`BATA --tests=TC001,TC002,...`
+`BEx --tests=TC001,TC002,...`
 
 ### --toreport=false
 During the script development, we dont want to generate reports as it becomes a heavy array of auto generated files. In that cases, where you don't want to generate reports, you can use this argument like below:
 
-`BATA --toreport=false`
+`BEx --toreport=false`
 
 **NOTE: You can use the arguments with any combinations**
 
@@ -871,30 +871,30 @@ If you have segregated your tests with `Suite` in `TestSuite.json`, you can run 
 
 Use below command to run your tests:
 
-`bata --suite=Smoke`
+`bex --suite=Smoke`
 
 ### Other Options
 
 #### --version
-To list the current version of BATA, you can use this option
+To list the current version of BEx, you can use this option
 
-`BATA --version`
+`BEx --version`
 
 ### --update@version
 If you want to download a specific version of the framework, they can use this option which will download the mentioned version in the `libs` folder.
 
 Usage:
 
-`bata --update@x.x.x`
+`BEx --update@x.x.x`
 
 If you want to download at specific path, you can add one more option `--path=DownloadPath` like below:
 
-`bata --update@x.x.x --path=DownloadPath`
+`BEx --update@x.x.x --path=DownloadPath`
 
 ### --summary
 You can generate a framework summary report containing number of test case and number of apis automated using this command.
 
-`bata --summary`
+`BEx --summary`
 
 ## Slack Notifications
 
@@ -904,7 +904,7 @@ This feature will look for other keys only if you provide `SlackNotify` as `true
 
 After successful implementation, you will receive message in below format:
 
-<img src="https://github.com/MAKnowledgeServices/BATA-Framework/blob/main/images/slack_notification.PNG?raw=true" alt="logo"><br/>
+<img src="https://github.com/MAKnowledgeServices/BEx-Framework/blob/main/images/slack_notification.PNG?raw=true" alt="logo"><br/>
 
 For creating new webhooks and modifying refer to wiki docs.
 
