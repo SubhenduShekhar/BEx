@@ -16,9 +16,9 @@ namespace BEx.Framework.Reporter
         }
         public void PostMessage()
         {
-            if (BaseClass.SlackNotify)
+            if (BaseClass.Config.FrameworkConfig.SlackNotify)
             {
-                HttpResponseMessage httpResponseMessage = aPIBase.POST(BaseClass.WebHookUrl, GetMessagePayload());
+                HttpResponseMessage httpResponseMessage = aPIBase.POST(BaseClass.Config.FrameworkConfig.WebHookUrl, GetMessagePayload());
                 if (Convert.ToInt32(httpResponseMessage.StatusCode) == 200)
                     report.Log("Reports posted to slack channel successfully");
                 else
@@ -34,7 +34,7 @@ namespace BEx.Framework.Reporter
         {
             String messagePayload = "{" +
                 "\"username\": \"automation-agent\"," +
-                "\"channel\" : \"" + BaseClass.Channel + "\"," +
+                "\"channel\" : \"" + BaseClass.Config.FrameworkConfig.Channel + "\"," +
                 "\"text\" : \"" + MessageBuilder() + "\"," +
                 "\"icon_url\": \"https://content.presentermedia.com/files/animsp/00014000/14495/three_simple_gears_turning_md_wm.gif\"" +
             "}";
@@ -43,9 +43,9 @@ namespace BEx.Framework.Reporter
 
         private String MessageBuilder()
         {
-            String message = "*" + BaseClass.ProjectName + "* executed successfully.\n" +
-                "*Environment* : " + BaseClass.Environment + "\n" + 
-                "*Run location* : " + BaseClass.RunLocation + "\n" +
+            String message = "*" + BaseClass.Config.FrameworkConfig.ProjectName + "* executed successfully.\n" +
+                "*Environment* : " + BaseClass.Config.FrameworkConfig.Environment + "\n" + 
+                "*Run location* : " + BaseClass.Config.FrameworkConfig.RunLocation + "\n" +
                 "Execution summary : \n";
             message += "Total test cases in scope : " + BaseClass.TestSuiteStatus.Keys.Count + "\n";
             foreach (String TestCase in BaseClass.TestSuiteStatus.Keys)
@@ -59,7 +59,7 @@ namespace BEx.Framework.Reporter
 
             }
             message += "cc ";
-            foreach (String eachTags in BaseClass.Tag)
+            foreach (String eachTags in BaseClass.Config.FrameworkConfig.Tag)
                 message += "<" + eachTags + ">";
             return message;
         }

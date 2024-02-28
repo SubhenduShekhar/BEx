@@ -6,7 +6,7 @@
   "Environment": "TEST",
   "ApiLibraryPath": "ApiLibrary",
   "ProjectName": "BEx unit tests",
-  "SlackNotify": true,
-  "Tag": [ "@kanika.goyal" ],
+  "SlackNotify": false,
+  "Tag": [ "@SlackTags" ],
   "RunLocation": "Local"
 }

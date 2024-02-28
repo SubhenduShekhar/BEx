@@ -46,7 +46,7 @@ namespace BEx.Framework.DataProvider
         public Excel(String SheetName, String Mode = "Read")
         {
             ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                      "Data Source='" + BaseClass.DataFilePath +
+                      "Data Source='" + BaseClass.Config.FrameworkConfig.DataFilePath +
                       "';Mode=" + Mode + ";Extended Properties=\"Excel 12.0;HDR=YES;IMEX=1;\"";
             this.SheetName = SheetName;
             using (OleDbConnection conn = new OleDbConnection(ConnectionString))
@@ -66,7 +66,7 @@ namespace BEx.Framework.DataProvider
         public Excel(String TestCaseName)
         {
             ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                      "Data Source='" + BaseClass.DataFilePath +
+                      "Data Source='" + BaseClass.Config.FrameworkConfig.DataFilePath +
                       "';Mode=Read;Extended Properties=\"Excel 12.0;HDR=YES;IMEX=1;\"";
             if (BaseClass.TestSuite[TestCaseName].TestSource.ToLower().Equals("coded"))
                 GetCodedData();

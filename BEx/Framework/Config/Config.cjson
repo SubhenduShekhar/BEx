@@ -1,0 +1,4 @@
+﻿{
+	"FrameworkConfig": $import "./FrameworkConfig.json",
+	"TestSuite": $import "./TestSuite.json"
+}

@@ -9,6 +9,7 @@ using BEx.Framework.Base;
 using BEx.Framework.DataProvider;
 using BEx.Framework.DataProvider.Formats;
 using BEx.Framework.Reporter;
+using BEx.Framework.Base.Poco;
 
 namespace BEx.Framework.Executor
 {
@@ -76,10 +77,9 @@ namespace BEx.Framework.Executor
         /// </summary>
         private static void ReadSuite(String[] TestCaseList = null)
         {
-            String SuiteFullPath = Data.GetFullPath(BaseClass.TestSuiteConfig);
+            String SuiteFullPath = Data.GetFullPath(BaseClass.Config.FrameworkConfig.TestSuiteConfig);
             JObject obj = Json.Read(SuiteFullPath);
-            obj = CheckBefore(obj);
-            BaseClass.TestSuite = obj.ToObject<Dictionary<String, TestSuite>>();
+            BaseClass.TestSuite = obj.ToObject<Dictionary<String, TestSuiteParams>>();
             if (TestCaseList != null)
             {
                 foreach(String EachTestCases in BaseClass.TestSuite.Keys)
@@ -98,7 +98,7 @@ namespace BEx.Framework.Executor
         }
         private void ReadAllTestCaseSteps(String TestCaseName)
         {
-            String TestsFullPath = Data.GetFullPath(BaseClass.TestCasePath);
+            String TestsFullPath = Data.GetFullPath(BaseClass.Config.FrameworkConfig.TestCasePath);
             dynamic obj;
             this.data.TestCase = new Dictionary<String, TestCase>();
             try
@@ -122,7 +122,7 @@ namespace BEx.Framework.Executor
                     List<String> testSteps = ((JArray)obj).ToObject<List<String>>();
                     foreach(String eachStep in testSteps)
                     {
-                        String stepContent = File.ReadAllText(Path.Combine(BaseClass.DataDirectory, "..", BaseClass.ApiLibraryPath, eachStep + ".json"));
+                        String stepContent = File.ReadAllText(Path.Combine(BaseClass.DataDirectory, "..", BaseClass.Config.FrameworkConfig.ApiLibraryPath, eachStep + ".json"));
                         testCase = JsonSerializer.Deserialize<TestCase>(stepContent);
                         this.data.TestCase.Add(eachStep, testCase);
                     }
@@ -138,17 +138,6 @@ namespace BEx.Framework.Executor
             httpClient = new HttpClient();
             httpResponse = httpClient.PostAsync(EndPoint, Payload).Result;
             return httpResponse;
-        }
-        private static JObject CheckBefore(JObject obj)
-        {
-            if (obj.ContainsKey("Before"))
-            {
-                BaseClass.Before = obj.SelectToken("$.Before").ToString();
-                obj.Remove("Before");
-                return obj;
-            }
-            else
-                return obj;
         }
     }
 }

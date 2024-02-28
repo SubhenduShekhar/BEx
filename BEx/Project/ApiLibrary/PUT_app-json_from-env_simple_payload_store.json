@@ -1,6 +1,7 @@
 ﻿{
   "SerialNo": 1,
   "EndPoint": "[from-env:BaseUrl]api/users/2",
+  "RequestType": "PUT",
   "StatusCode": 200,
   "ReportResponse": true,
   "Store": [

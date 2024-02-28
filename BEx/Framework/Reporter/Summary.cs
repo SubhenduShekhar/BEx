@@ -1,4 +1,5 @@
 ﻿using BEx.Framework.Base;
+using BEx.Framework.Base.Poco;
 using BEx.Framework.DataProvider;
 using BEx.Framework.DataProvider.Formats;
 using BEx.Framework.Executor;
@@ -12,26 +13,17 @@ namespace BEx.Framework.Reporter
 {
     public class Summary
     {
-        Data data { get; set; }
-        APIBase aPIBase { get; set; }
-        Scriptless scriptless { get; set; }
         public Int32 GetAllTestCases()
         {
             Int32 count = 0;
-            foreach(TestSuite EachKey in BaseClass.TestSuite.Values)
+            foreach(TestSuiteParams EachKey in BaseClass.TestSuite.Values)
             {
                 if (EachKey.TestSource.ToLower().Equals("scriptless"))
                     count++;
             }
             return count;
         }
-        private String GetTestScriptPath(String TestCaseName)
-        {
-            String FrameworkConfigPath = Data.GetFullPath("Framework\\Config\\FrameworkConfig.json");
-            BaseClass.FrameworkConfig = Json.Read(FrameworkConfigPath);
-
-            return Path.Combine(Data.SearchFile(BaseClass.FrameworkConfig.SelectToken("$.TestCasePath").ToString()), TestCaseName + ".json");
-        }
+        private String GetTestScriptPath(String TestCaseName) => Path.Combine(Data.SearchFile(BaseClass.Config?.FrameworkConfig.TestCasePath), TestCaseName + ".json");
         public List<String> GetTotalApi()
         {
             List<String> TestSteps = new List<String>();

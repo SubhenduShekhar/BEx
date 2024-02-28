@@ -1,5 +1,4 @@
 ﻿{
-  "Before": "BeforeSteps",
   "GET": {
     "ToExecute": "Yes",
     "TestSource": "Scriptless",
@@ -21,11 +20,6 @@
   "DELETE": {
     "ToExecute": "Yes",
     "TestSource": "Scriptless",
-    "Suite": [ "Regression" ]
-  },
-  "CodedScript": {
-    "ToExecute": "Yes",
-    "TestSource": "Coded",
     "Suite": [ "Regression" ]
   }
 }
