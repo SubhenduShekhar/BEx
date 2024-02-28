@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CJson" Version="2.0.0" />
     <PackageReference Include="ExtentReports" Version="4.1.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0" />
@@ -16,5 +17,7 @@
     <PackageReference Include="System.CodeDom" Version="7.0.0" />
     <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties framework_4config_4frameworkconfig_1json__JsonSchema="https://raw.githubusercontent.com/SubhenduShekhar/BEx/main/schemas/FrameworkConfig.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

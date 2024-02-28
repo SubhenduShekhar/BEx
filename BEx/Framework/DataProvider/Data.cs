@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using BEx.Framework.Base;
+using BEx.Framework.Base.Poco;
 using BEx.Framework.DataProvider.Formats;
+using BEx.Framework.Poco;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,7 +15,6 @@ namespace BEx.Framework.DataProvider
     public sealed class Data
     {
         private static Excel excel { get; set; }
-        private static Xml Xml { get; } = new Xml();
         private static Dictionary<String, String> environment { get; set; }
         private Dictionary<String, String> data { get; set; }
         public String TestStepName { get; set; }
@@ -30,6 +31,7 @@ namespace BEx.Framework.DataProvider
         public Data(String TestCaseName)
         {
             sharedObjects = new Dictionary<String, Object>();
+
             if (BaseClass.DataFileFormat == null)
                 data = new Dictionary<String, String>();
             if (BaseClass.TestSuite[TestCaseName].TestSource.ToLower().Equals("coded"))
@@ -48,79 +50,76 @@ namespace BEx.Framework.DataProvider
             else if (BaseClass.TestSuite[TestCaseName].TestSource.ToLower().Equals("scriptless"))
             {
                 Console.WriteLine("Initializing data object for scriptless execution");
-                if (BaseClass.TestSuite[TestCaseName].DataKey != null && 
-                    (BaseClass.TestDataFormat.ToLower().Equals("excel") ||
-                     BaseClass.TestDataFormat.ToLower().Equals("xlsx")))
-                {
-                    excel = new Excel(BaseClass.TestSuite[TestCaseName].DataKey, "Read");
-                    ExcelHeaders = excel.GetHeaders();
-                    ExcelData = excel.GetData();
-                }
+                if(BaseClass.TestDataFormat is not null)
+                    if (BaseClass.TestSuite[TestCaseName].DataKey != null && 
+                        (BaseClass.TestDataFormat.ToLower().Equals("excel") ||
+                         BaseClass.TestDataFormat.ToLower().Equals("xlsx")))
+                    {
+                        excel = new Excel(BaseClass.TestSuite[TestCaseName].DataKey, "Read");
+                        ExcelHeaders = excel.GetHeaders();
+                        ExcelData = excel.GetData();
+                    }
             }
         }
         private static void Init()
         {
+            ReadConfiguration();
             ReadEnvironments();
-            ReadFrameworkConfig();
             SetFramework();
-            if (BaseClass.TestDataFormat != "")
-                BaseClass.DataFileFormat = BaseClass.DataFilePath.Split(".")[BaseClass.DataFilePath.Split(".").Length - 1].ToLower();
+            if (BaseClass.Config.FrameworkConfig.TestDataFormat != "")
+                BaseClass.DataFileFormat = BaseClass.Config.FrameworkConfig.DataFilePath.Split(".")[BaseClass.Config.FrameworkConfig.DataFilePath.Split(".").Length - 1].ToLower();
         }
         private static void ReadEnvironments()
         {
             String EnvironmentPath = GetFullPath("Framework\\Config\\Environment.json");
             BaseClass.Environments = Json.Read(EnvironmentPath);
         }
-        private static void ReadFrameworkConfig()
-        {
-            String FrameworkConfigPath = GetFullPath("Framework\\Config\\FrameworkConfig.json");
-            BaseClass.FrameworkConfig = Json.Read(FrameworkConfigPath);
-        }
         private static void SetFramework()
         {
-            try
-            {
-                BaseClass.FrameworkConfigFilePath = GetFullPath("Framework\\Config\\FrameworkConfig.json");
-            }
-            catch
+            FrameworkConfig? FrameworkConfig = BaseClass.Config?.FrameworkConfig;
+            if(FrameworkConfig == null)
             {
                 Console.WriteLine(DateTime.Now + " Config key : FrameworkConfigFilePath not found.");
                 Console.WriteLine("Please provide config file in Framework\\Config\\FrameworkConfig.json");
                 Environment.Exit(1);
             }
-            try
-            {
-                BaseClass.TestDataFormat = BaseClass.FrameworkConfig.GetValue("TestDataFormat").ToString().ToLower();
-            }
-            catch
+
+            if (FrameworkConfig.TestDataFormat == null)
             {
                 Console.WriteLine(DateTime.Now + " Config key : TestDataFormat not found.");
                 BaseClass.TestDataFormat = "excel";
                 Console.WriteLine("Taking default test data format as : excel");
                 Console.WriteLine("Else, please provide config file in Framework\\Config\\FrameworkConfig.json");
             }
+            
             try
             {
-                String RawPath = SearchFile(BaseClass.FrameworkConfig.GetValue("DataFilePath").ToString());
+                String RawPath = SearchFile(FrameworkConfig.DataFilePath);
                 if (IsDirectory(RawPath))
                 {
                     BaseClass.DataDirectory = RawPath;
-                    if (BaseClass.TestDataFormat.Equals(""))
+                    if (FrameworkConfig.TestDataFormat == null)
+                        throw new Exception("TestDataFormat key is required if DataFilePath is a directory");
+
+                    if (FrameworkConfig.TestDataFormat.Equals(""))
                     {
                         Console.WriteLine("Test data framework is set for scriptless execution only");
                     }
-                    else if (BaseClass.TestDataFormat.Equals("excel") || BaseClass.TestDataFormat.Equals("xlsx"))
+                    else if (FrameworkConfig.TestDataFormat.Equals("excel") || FrameworkConfig.TestDataFormat.Equals("xlsx"))
                     {
                         String FilePath = GetExcelFileName(RawPath);
-                        BaseClass.DataFilePath = FilePath;
+                        BaseClass.Config.FrameworkConfig.DataFilePath = FilePath;
                     }
                     else
                         throw new Exception("Framework is not configured for file format " + BaseClass.TestDataFormat);
                 }
                 else if (IsFile(RawPath))
                 {
-                    BaseClass.DataFilePath = RawPath;
-                    if (BaseClass.TestDataFormat.Equals("excel") || BaseClass.TestDataFormat.Equals("xlsx"))
+                    BaseClass.Config.FrameworkConfig.DataFilePath = RawPath;
+                    if (FrameworkConfig.TestDataFormat == null)
+                        throw new Exception("TestDataFormat key is required if DataFilePath is a directory");
+
+                    if (FrameworkConfig.TestDataFormat.Equals("excel") || FrameworkConfig.TestDataFormat.Equals("xlsx"))
                     {
                         String Path = "";
                         for (Int32 i = 0; i < RawPath.Split("\\").Length - 1; i++)
@@ -128,7 +127,7 @@ namespace BEx.Framework.DataProvider
                         BaseClass.DataDirectory = Path;
                     }
                     else
-                        throw new Exception("Framework is not configured for file format " + BaseClass.TestDataFormat);
+                        throw new Exception("Framework is not configured for file format " + FrameworkConfig.TestDataFormat);
                 }
             }
             catch (Exception e)
@@ -136,7 +135,7 @@ namespace BEx.Framework.DataProvider
                 Console.WriteLine(DateTime.Now + " Something went wrong with config key : DataFilePath not found.");
                 Console.WriteLine("Either DataFilePath or TestDataFormat is not configured properly");
 
-                BaseClass.DataFilePath = SearchFile(Path.Combine(BaseClass.FrameworkConfig.GetValue("DataFilePath").ToString(), "RunManager.xlsx"));
+                BaseClass.Config.FrameworkConfig.DataFilePath = SearchFile(Path.Combine(FrameworkConfig.DataFilePath, "RunManager.xlsx"));
                 Console.WriteLine("Taking default test data file name as : RunManager.xlsx");
                 Console.WriteLine("NOTE: This file name is obsolete and will be removed in next version of framework releases");
             }
@@ -151,108 +150,68 @@ namespace BEx.Framework.DataProvider
                 Console.WriteLine(e.Message);
                 Environment.Exit(1);
             }
-            try
-            {
-                BaseClass.Environment = BaseClass.FrameworkConfig.GetValue("Environment").ToString();
-            }
-            catch (Exception e)
+
+            if (FrameworkConfig.Environment == null)
             {
                 Console.WriteLine("Failed to initialize environment...");
                 Console.WriteLine("Please provide \"Environment\": \"test\"");
-                Console.WriteLine(e.Message);
                 Environment.Exit(1);
             }
-            try
-            {
-                BaseClass.TestSuiteConfig = GetFullPath(BaseClass.FrameworkConfig.GetValue("TestSuiteConfig").ToString());
-            }
-            catch
+            if (FrameworkConfig.TestSuiteConfig == null)
             {
                 Console.WriteLine(DateTime.Now + " Config key : TestSuiteConfig not found.");
                 Console.WriteLine("Please provide test suite config path");
                 Console.WriteLine("For example: \"TestSuiteConfig\": \".\\Framework\\Config\\TestSuite.json");
                 Environment.Exit(1);
             }
-            try
-            {
-                BaseClass.TestCasePath = GetFullPath(BaseClass.FrameworkConfig.GetValue("TestCasePath").ToString());
-            }
-            catch
+            if(FrameworkConfig.TestCasePath == null)
             {
                 Console.WriteLine(DateTime.Now + " Config key : TestCasePath not found.");
                 Console.WriteLine("Please provide test case path");
                 Console.WriteLine("For example: \"TestCasePath\": \".\\Project\\TestScript\\");
                 Environment.Exit(1);
             }
-            try
-            {
-                BaseClass.ProjectName = BaseClass.FrameworkConfig.GetValue("ProjectName").ToString();
-            }
-            catch
+            if(FrameworkConfig.ProjectName == null)
             {
                 Console.WriteLine(DateTime.Now + " Warning - Config key : ProjectName not found.");
                 Console.WriteLine("Please provide project name. This is required for reporting purpose.");
-                Console.WriteLine("For example: \"ProjectName\": \"BeatFlow\"");
+                Console.WriteLine("For example: \"ProjectName\": \"YOUR_PROJECT_NAME\"");
                 Console.WriteLine();
                 Environment.Exit(1);
             }
-            try
+            if(FrameworkConfig.DownloadPath == null)
             {
-                BaseClass.DownloadPath = BaseClass.FrameworkConfig.GetValue("DownloadPath").ToString();
+                BaseClass.Config.FrameworkConfig.DownloadPath = Path.Combine(BaseClass.DataDirectory, "Extracts");
+                Console.WriteLine("Setting download path to : " + BaseClass.Config.FrameworkConfig.DownloadPath);
             }
-            catch
-            {
-                BaseClass.DownloadPath = Path.Combine(BaseClass.DataDirectory, "Extracts");
-                Console.WriteLine("Setting download path to : " + BaseClass.DownloadPath);
-            }
-            try
-            {
-                BaseClass.ApiLibraryPath = BaseClass.FrameworkConfig.GetValue("ApiLibraryPath").ToString();
-            }
-            catch
+            if(FrameworkConfig.ApiLibraryPath == null)
             {
                 Console.WriteLine("ApiLibraryPath is not provided...");
                 Console.WriteLine("Continuing with general scriptless paths");
             }
-            if (BaseClass.FrameworkConfig.GetValue("SlackNotify") != null)
+            if (FrameworkConfig.SlackNotify)
             {
-                BaseClass.SlackNotify = Convert.ToBoolean(BaseClass.FrameworkConfig.GetValue("SlackNotify"));
-
-                if (BaseClass.FrameworkConfig.GetValue("WebHookUrl") != null)
-                    BaseClass.WebHookUrl = BaseClass.FrameworkConfig.GetValue("WebHookUrl").ToString();
-                else
+                if (FrameworkConfig.WebHookUrl == null)
                 {
-                    Console.WriteLine("Slack webhook url is not provided");
-                    BaseClass.WebHookUrl = "https://hooks.slack.com/services/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";
-                    Console.WriteLine("Default webhook url : https://hooks.slack.com/services/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");
-                    Console.WriteLine("continuing...");
+                    Console.WriteLine("SlackNotify is true but slack WebHookUrl is not provided");
+                    Environment.Exit(1);
                 }
-                if (BaseClass.FrameworkConfig.GetValue("Channel") != null)
-                    BaseClass.Channel = BaseClass.FrameworkConfig.GetValue("Channel").ToString();
-                else
+                if (FrameworkConfig.Channel == null)
                 {
-                    Console.WriteLine("Slack channel is not provided");
-                    BaseClass.Channel = "#automation";
-                    Console.WriteLine("Default channel : #automation");
-                    Console.WriteLine("continuing...");
+                    Console.WriteLine("SlackNotify is true but slack channel is not provided");
+                    Environment.Exit(1);
                 }
-                if (BaseClass.FrameworkConfig.GetValue("RunLocation") != null)
-                    BaseClass.RunLocation = BaseClass.FrameworkConfig.GetValue("RunLocation").ToString();
-                else
+                if (FrameworkConfig.RunLocation == null)
                 {
                     Console.WriteLine("Run location is not provided");
-                    BaseClass.RunLocation = "LOCAL";
+                    BaseClass.Config.FrameworkConfig.RunLocation = "LOCAL";
                     Console.WriteLine("Default RunLocation : LOCAL");
                     Console.WriteLine("continuing...");
                 }
-                if (BaseClass.FrameworkConfig.GetValue("Tag") != null)
-                    BaseClass.Tag = JsonConvert.DeserializeObject<List<String>>(BaseClass.FrameworkConfig.GetValue("Tag").ToString());
-                else
+                if (FrameworkConfig.Tag == null)
                 {
                     Console.WriteLine("Slack message tag is not provided");
-                    BaseClass.Tag = new List<String>();
-                    BaseClass.Tag.Add("@kanika.goyal");
-                    Console.WriteLine("Default Tag : @kanika.goyal");
+                    BaseClass.Config.FrameworkConfig.Tag = new List<String>();
                     Console.WriteLine("continuing...");
                 }
             }
@@ -330,8 +289,7 @@ namespace BEx.Framework.DataProvider
         {
             if (BaseClass.DataFileFormat == null)
                 Init();
-            if (BaseClass.FrameworkConfigFilePath.Contains(".config"))
-                environment = Xml.Read(GetFullPath(BaseClass.FrameworkConfigFilePath));
+            else throw new Exception("Something wrong happened in reading environment data");
         }
         public static String GetEnvironmentData(String EnvKey)
         {
@@ -375,10 +333,7 @@ namespace BEx.Framework.DataProvider
         }
         public static Boolean IsEnvironmentPresent()
         {
-            if (BaseClass.Environments.SelectToken(BaseClass.Environment) != null)
-                return true;
-            else
-                return false;
+            return (BaseClass.Environments?.SelectToken(BaseClass.Config.FrameworkConfig.Environment) != null);
         }
         public String GetEnvironmentValue(String Key, Int32 Index = -1)
         {
@@ -485,10 +440,6 @@ namespace BEx.Framework.DataProvider
             }
             return testStep;
         }
-        public String Get(String DataKey)
-        {
-            return data[DataKey];
-        }
         public TestCase MergeTestStep(TestCase ExcelTestStep, TestCase RawTestStep)
         {
             if (RawTestStep.ContentType == null)
@@ -529,15 +480,16 @@ namespace BEx.Framework.DataProvider
                 RawTestStep.DataSource = ExcelTestStep.DataSource;
             return RawTestStep;
         }
-        public void InitBeforeTest()
-        {
-            String FilePath = Data.SearchFile(Path.Combine(BaseClass.TestCasePath, BaseClass.Before + ".json"));
-            BaseClass.BeforeTest = JsonConvert.DeserializeObject<Dictionary<String, TestCase>>(File.ReadAllText(FilePath));
-        }
         public static void EnsureDirectory(String path)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+        }
+        private static void ReadConfiguration()
+        {
+            String FullPath = GetFullPath(BaseClass.BaseConfigPath + "\\Config.cjson");
+            BaseClass.ConfigCjson = new CJson.CJson<Config>(new CJson.Path(FullPath));
+            BaseClass.Config = BaseClass.ConfigCjson.Deserialize();
         }
     }
 }

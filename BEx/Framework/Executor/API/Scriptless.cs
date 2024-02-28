@@ -1,18 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
 using BEx.Framework.Base;
 using BEx.Framework.DataProvider.Formats;
 using BEx.Framework.Reporter;
-using System.IO;
-using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using System.Reflection;
-using System.Net;
 using BEx.Framework.DataProvider;
 
 namespace BEx.Framework.Executor.API
@@ -90,7 +84,7 @@ namespace BEx.Framework.Executor.API
                                 if (FromEnvVal.Split(":").Count() == 2)
                                 {
                                     String key = FromEnvVal.Split(":")[1];
-                                    String Val = aPIBase.data.GetEnvironmentValue(BaseClass.Environment + "." + key);
+                                    String Val = aPIBase.data.GetEnvironmentValue(BaseClass.Config.FrameworkConfig.Environment + "." + key);
                                     TestStep.Headers[headerKey] = TestStep.Headers[headerKey].Replace("[from-env:" + key + "]", Val);
                                 }
                                 if (FromEnvVal.Split(":").Count() == 3)
@@ -152,7 +146,7 @@ namespace BEx.Framework.Executor.API
                     if (splittedVal[i].StartsWith("from-env"))
                     {
                         key = splittedVal[i].Split("from-env:")[1].Split("]")[0];
-                        String env = BaseClass.Environment;
+                        String env = BaseClass.Config.FrameworkConfig.Environment;
                         String newKey = key;
                         if (key.Contains(":"))
                         {
@@ -223,9 +217,9 @@ namespace BEx.Framework.Executor.API
                     try
                     {
                         byte[] fileBytes = aPIBase.httpClient.GetByteArrayAsync(aPIBase.data.TestStep.EndPoint).Result;
-                        Data.EnsureDirectory(BaseClass.DownloadPath);
-                        File.WriteAllBytes(Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs), fileBytes);
-                        BaseClass.Reporter.AddResult(Report.Status.Pass, "File downloaded at location : " + Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs));
+                        Data.EnsureDirectory(BaseClass.Config.FrameworkConfig.DownloadPath);
+                        File.WriteAllBytes(Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs), fileBytes);
+                        BaseClass.Reporter.AddResult(Report.Status.Pass, "File downloaded at location : " + Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs));
                         EnsureFile();
                         CustomCode(TestStep.CustomCode);
                     }
@@ -321,9 +315,9 @@ namespace BEx.Framework.Executor.API
                     {
                         aPIBase.httpResponse = aPIBase.httpClient.PostAsync(aPIBase.data.TestStep.EndPoint, aPIBase.httpContent).Result;
                         byte[] bt = aPIBase.httpResponse.Content.ReadAsByteArrayAsync().Result;
-                        Data.EnsureDirectory(Path.Combine(BaseClass.DownloadPath));
-                        File.WriteAllBytes(Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs), bt);
-                        BaseClass.Reporter.AddResult(Report.Status.Pass, "File downloaded at location : " + Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs));
+                        Data.EnsureDirectory(Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath));
+                        File.WriteAllBytes(Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs), bt);
+                        BaseClass.Reporter.AddResult(Report.Status.Pass, "File downloaded at location : " + Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs));
                         EnsureFile();
                         CustomCode(TestStep.CustomCode);
                     }
@@ -789,7 +783,7 @@ namespace BEx.Framework.Executor.API
                     if (Payload.Contains("from-env:"))
                     {
                         String key = Payload.Split("from-env:")[1].Split("]")[0];
-                        Payload = Payload.Replace("[from-env:" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Environment + "." + key));
+                        Payload = Payload.Replace("[from-env:" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Config.FrameworkConfig.Environment + "." + key));
                     }
                 }
                 if (Payload.Contains("[Fetch"))
@@ -814,7 +808,7 @@ namespace BEx.Framework.Executor.API
                         try
                         {
                             String key = Payload.Split("[from-env:")[1].Split("]")[0];
-                            String value = aPIBase.data.GetEnvironmentValue(BaseClass.Environment + "." + key);
+                            String value = aPIBase.data.GetEnvironmentValue(BaseClass.Config.FrameworkConfig.Environment + "." + key);
                             Payload = Payload.Replace("[from-env:" + key + "]", value);
                         }
                         catch { }
@@ -897,7 +891,7 @@ namespace BEx.Framework.Executor.API
                         if (TestStep.Payload[Keys].Contains("from-env:"))
                         {
                             String key = TestStep.Payload[Keys].Split("from-env:")[1].Split("]")[0];
-                            TestStep.Payload[Keys] = TestStep.Payload[Keys].Replace("[from-env:" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Environment + "." + key));
+                            TestStep.Payload[Keys] = TestStep.Payload[Keys].Replace("[from-env:" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Config.FrameworkConfig.Environment + "." + key));
                         }
                     }
                     if (TestStep.Payload[Keys].Contains("GetDate("))
@@ -1034,7 +1028,7 @@ namespace BEx.Framework.Executor.API
                                     String key = EachVal.Substring(1).Split("]")[0];
                                     if (key.Contains("["))
                                         key += "]";
-                                    String decodedVal = EachVal.Replace(":" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Environment + "." + key));
+                                    String decodedVal = EachVal.Replace(":" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Config.FrameworkConfig.Environment + "." + key));
                                     Val += decodedVal;
                                 }
                                 else if(EachVal.Split(":").Count() == 3)
@@ -1148,7 +1142,7 @@ namespace BEx.Framework.Executor.API
                                     String key = EachVal.Substring(1).Split("]")[0];
                                     if (key.Contains("["))
                                         key += "]";
-                                    String decodedVal = EachVal.Replace(":" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Environment + "." + key));
+                                    String decodedVal = EachVal.Replace(":" + key + "]", aPIBase.data.GetEnvironmentValue(BaseClass.Config.FrameworkConfig.Environment + "." + key));
                                     Val += decodedVal;
                                 }
                                 else if(EachVal.Split(":").Count() == 3)
@@ -1658,12 +1652,12 @@ namespace BEx.Framework.Executor.API
             {
                 try
                 {
-                    Data.SearchFile(Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs));
-                    BaseClass.Reporter.AddResult(Report.Status.Pass, "Validated downloaded file at location : " + Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs));
+                    Data.SearchFile(Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs));
+                    BaseClass.Reporter.AddResult(Report.Status.Pass, "Validated downloaded file at location : " + Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs));
                 }
                 catch
                 {
-                    BaseClass.Reporter.AddResult(Report.Status.Fail, "Failed to validate downloaded file at location : " + Path.Combine(BaseClass.DownloadPath, TestStep.DownloadFileAs));
+                    BaseClass.Reporter.AddResult(Report.Status.Fail, "Failed to validate downloaded file at location : " + Path.Combine(BaseClass.Config.FrameworkConfig.DownloadPath, TestStep.DownloadFileAs));
                 }
             }
             else

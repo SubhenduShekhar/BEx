@@ -12,11 +12,11 @@ using Newtonsoft.Json;
 
 namespace BEx.Framework
 {
-    public class Driver
+    public sealed class Driver
     {
-        private static String[] TestCaseList { get; set; }
+        private static String[]? TestCaseList { get; set; }
         private static Boolean ToReport { get; set; } = true;
-        private static String Suite { get; set; }
+        private static String? Suite { get; set; }
         /// <summary>
         /// Execute with commandline arguments
         /// </summary>
@@ -100,7 +100,7 @@ namespace BEx.Framework
             }
             else
             {
-                BaseClass.Reporter.Log("Environment \"" + BaseClass.Environment + "\" not present in Environment.json file... Please check");
+                BaseClass.Reporter.Log("Environment \"" + BaseClass.Config.FrameworkConfig.Environment + "\" not present in Environment.json file... Please check");
                 Environment.Exit(1);
             }
 
@@ -112,18 +112,6 @@ namespace BEx.Framework
             }
             BaseClass.Reporter.SuiteResult();
             #endregion
-        }
-        /// <summary>
-        /// Execute coded format tests
-        /// </summary>
-        /// <param name="ClassName">Test script class name</param>
-        /// <param name="ComponentName">Test script component</param>
-        /// <param name="data">Test data</param>
-        private static void Execute(String ClassName, String ComponentName, Data data)
-        {
-            Type type = Type.GetType(ClassName);
-            MethodInfo method = type.GetMethod(ComponentName);
-            String result = (String)method.Invoke(Activator.CreateInstance(type), new Object[] { data });
         }
         private static void NoArgsExecute()
         {
@@ -159,7 +147,7 @@ namespace BEx.Framework
             }
             else
             {
-                BaseClass.Reporter.Log("Environment \"" + BaseClass.Environment + "\" not present in Environment.json file... Please check");
+                BaseClass.Reporter.Log("Environment \"" + BaseClass.Config.FrameworkConfig.Environment + "\" not present in Environment.json file... Please check");
                 Environment.Exit(1);
             }
 
@@ -172,122 +160,67 @@ namespace BEx.Framework
             BaseClass.Reporter.SuiteResult();
             #endregion
         }
-        private static APIBase ExecuteTests(String testCases, 
-            Data data, 
+        private static APIBase ExecuteTests(String testCases,
+            Data data,
             APIBase aPIBase, Scriptless scriptless)
         {
-            var type = typeof(ITestCaseBase);
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => type.IsAssignableFrom(p));
+            #region Scriptless
+            data = new Data(testCases);
+            BaseClass.Reporter?.InitTest(testCases);
+            aPIBase = new APIBase(testCases, data);
+            aPIBase.InitTest(testCases);
+            scriptless = new Scriptless(aPIBase);
 
-            if (BaseClass.TestSuite[testCases].TestSource.ToLower().Equals("coded"))
+            try
             {
-                #region Coded
-                foreach (var eachType in types)
+                if (BaseClass.TestSuite[testCases].ToExecute.ToLower().Contains("y"))
                 {
-                    if (testCases == eachType.Name)
+                    BaseClass.Reporter?.Log("Executing test case : " + testCases);
+                    BaseClass.Reporter?.Log("This test case contains " + aPIBase.data.TestCase.Keys.Count + " test steps");
+
+                    aPIBase.SerialNo = 1;
+                    foreach (String TestStepName in aPIBase.data.TestCase.Keys)
                     {
-                        BaseClass.Reporter.InitTest(eachType.Name);
-                        if (BaseClass.TestSuite[testCases].ToExecute.ToLower().Contains("y"))
+                        BaseClass.Reporter?.AddResult(Report.Status.Info, "Executing test step : " + TestStepName);
+                        if (data.IsDataDrive(TestStepName))
                         {
-                            data = new Data(eachType.Name);
-                            aPIBase = new APIBase(eachType.Name, data);
-
-                            try
+                            BaseClass.Reporter?.Log("This is a data driven test case with " + data.StepExcelData.Count + " iterations");
+                            Int32 count = 1;
+                            foreach (Dictionary<String, String> eachData in data.StepExcelData)
                             {
-                                if (eachType.Name.Equals("ITestCaseBase"))
-                                    continue;
-
-                                Execute(eachType.FullName, "BeforeSuite", data);
-                                Execute(eachType.FullName, "BeforeTest", data);
-                                Execute(eachType.FullName, "Test", data);
-                                Execute(eachType.FullName, "AfterTest", data);
-                                Execute(eachType.FullName, "AfterSuite", data);
-
-                                BaseClass.Reporter.EndTest(eachType.Name);
-                                BaseClass.Reporter.MarkTestCase(Report.Status.Pass);
+                                try
+                                {
+                                    BaseClass.Reporter?.AddResult(Report.Status.Info, "Executing data driven test for iteration : " + count);
+                                    TestCase testStep = data.GetTestStep(eachData);
+                                    ExecuteTestStep(TestStepName, data, aPIBase, scriptless, testStep);
+                                    BaseClass.Reporter?.AddResult(Report.Status.Pass, "Iteration : " + count + " passed");
+                                }
+                                catch (Exception e)
+                                {
+                                    BaseClass.Reporter?.AddResult(Report.Status.Fail, "Iteration : " + count + " failed");
+                                }
+                                count++;
                             }
-                            catch { }
                         }
                         else
                         {
-                            BaseClass.Reporter.AddResult(Report.Status.Skip, "Skipping test case : " + testCases);
-                            BaseClass.Reporter.MarkTestCase(Report.Status.Pass);
+                            ExecuteTestStep(TestStepName, data, aPIBase, scriptless);
                         }
-                        break;
+                        aPIBase.SerialNo++;
                     }
+                    BaseClass.Reporter?.EndTest(testCases);
+                    BaseClass.Reporter?.MarkTestCase(Report.Status.Pass);
                 }
-                #endregion
+                else
+                    BaseClass.Reporter?.AddResult(Report.Status.Skip, "Skipping test case : " + testCases);
             }
-            else if (BaseClass.TestSuite[testCases].TestSource.ToLower().Equals("scriptless"))
+            catch (Exception e)
             {
-                #region Scriptless
-                data = new Data(testCases);
-                BaseClass.Reporter.InitTest(testCases);
-                aPIBase = new APIBase(testCases, data);
-                aPIBase.InitTest(testCases);
-                scriptless = new Scriptless(aPIBase);
-
-                try
-                {
-                    if (BaseClass.TestSuite[testCases].ToExecute.ToLower().Contains("y"))
-                    {
-                        BaseClass.Reporter.Log("Executing test case : " + testCases);
-                        BaseClass.Reporter.Log("This test case contains " + aPIBase.data.TestCase.Keys.Count + " test steps");
-                        
-                        // Before test execution
-                        if(BaseClass.Before != null)
-                        {
-                            BaseClass.Reporter.Log("BeforeTest script is provided");
-                            BaseClass.Reporter.AddResult(Report.Status.Info, "Executing before scripts.");
-                            ExecuteTestByScript("Before", aPIBase, data, scriptless);
-                        }
-
-                        aPIBase.SerialNo = 1;
-                        foreach (String TestStepName in aPIBase.data.TestCase.Keys)
-                        {
-                            BaseClass.Reporter.AddResult(Report.Status.Info, "Executing test step : " + TestStepName);
-                            if (data.IsDataDrive(TestStepName))
-                            {
-                                BaseClass.Reporter.Log("This is a data driven test case with " + data.StepExcelData.Count + " iterations");
-                                Int32 count = 1;
-                                foreach (Dictionary<String, String> eachData in data.StepExcelData)
-                                {
-                                    try
-                                    {
-                                        BaseClass.Reporter.AddResult(Report.Status.Info, "Executing data driven test for iteration : " + count);
-                                        TestCase testStep = data.GetTestStep(eachData);
-                                        ExecuteTestStep(TestStepName, data, aPIBase, scriptless, testStep);
-                                        BaseClass.Reporter.AddResult(Report.Status.Pass, "Iteration : " + count + " passed");
-                                    }
-                                    catch(Exception e)
-                                    {
-                                        BaseClass.Reporter.AddResult(Report.Status.Fail, "Iteration : " + count + " failed");
-                                    }
-                                    count++;
-                                }
-                            }
-                            else
-                            {
-                                ExecuteTestStep(TestStepName, data, aPIBase, scriptless);
-                            }
-                            aPIBase.SerialNo++;
-                        }
-                        BaseClass.Reporter.EndTest(testCases);
-                        BaseClass.Reporter.MarkTestCase(Report.Status.Pass);
-                    }
-                    else
-                        BaseClass.Reporter.AddResult(Report.Status.Skip, "Skipping test case : " + testCases);
-                }
-                catch(Exception e) 
-                {
-                    Console.WriteLine(e);
-                    BaseClass.Reporter.AddResult(Report.Status.Fail, e.Message);
-                    BaseClass.Reporter.MarkTestCase(Report.Status.Fail);
-                }
-                #endregion
+                Console.WriteLine(e);
+                BaseClass.Reporter?.AddResult(Report.Status.Fail, e.Message);
+                BaseClass.Reporter?.MarkTestCase(Report.Status.Fail);
             }
+            #endregion
             return aPIBase;
         }
         public static void Main(String[] args)
@@ -346,36 +279,10 @@ namespace BEx.Framework
         private static void VersionInfo()
         {
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("BEAT API Test Automation Framework [Version 3.0.0]");
-            Console.WriteLine("(c) Acuity - BEAT.All rights reserved");
-            Console.WriteLine();
+            Console.WriteLine("Backend Explorer [Version 1.0.0]");
+            Console.WriteLine("(c) All rights reserved");
             Console.WriteLine();
             Console.ResetColor();
-        }
-        private static void ExecuteTestByScript(String ScriptName, APIBase aPIBase, Data data, Scriptless scriptless)
-        {
-            if(ScriptName == "Before")
-            {
-                if (BaseClass.BeforeTest == null)
-                    data.InitBeforeTest();
-                aPIBase.SerialNo = 1;
-                foreach (String TestStepName in BaseClass.BeforeTest.Keys)
-                {
-                    Int32 count = 1;
-                    try
-                    {
-                        TestCase testStep = BaseClass.BeforeTest[TestStepName];
-                        ExecuteTestStep(TestStepName, data, aPIBase, scriptless, testStep, false);
-                        BaseClass.Reporter.AddResult(Report.Status.Pass, "Before script passed");
-                    }
-                    catch (Exception e)
-                    {
-                        BaseClass.Reporter.AddResult(Report.Status.Fail, "Before script failed");
-                    }
-                    count++;
-                }
-                aPIBase.SerialNo++;
-            }
         }
     }
 }
