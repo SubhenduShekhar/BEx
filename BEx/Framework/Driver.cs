@@ -100,7 +100,7 @@ namespace BEx.Framework
             }
             else
             {
-                BaseClass.Reporter.Log("Environment \"" + BaseClass.Config.FrameworkConfig.Environment + "\" not present in Environment.json file... Please check");
+                BaseClass.Reporter.Log("Environment \"" + BaseClass.Config?.FrameworkConfig.Environment + "\" not present in Environment.json file... Please check");
                 Environment.Exit(1);
             }
 

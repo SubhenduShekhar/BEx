@@ -27,14 +27,14 @@ namespace BEx.Framework.Executor.API
         public void CheckMandatory()
         {
             if (aPIBase.data.TestCase.Count == 0)
-                BaseClass.Reporter.AddResult(Reporter.Report.Status.Info, "This test case as no steps");
+                BaseClass.Reporter?.AddResult(Reporter.Report.Status.Info, "This test case as no steps");
             if (TestStep.SerialNo.ToString() == null)
                 throw new Exception("SerialNo key cannot be null");
             if(TestStep.RequestType== null)
                 throw new Exception("RequestType key cannot be null");
             if (TestStep.StatusCode.ToString() == null)
             {
-                BaseClass.Reporter.AddResult(Report.Status.Info, "StatusCode not provided... proceeding with 200-OK");
+                BaseClass.Reporter?.AddResult(Report.Status.Info, "StatusCode not provided... proceeding with 200-OK");
                 aPIBase.data.TestStep.StatusCode = 200;
             }
             if (TestStep.EndPoint == null)
@@ -109,7 +109,7 @@ namespace BEx.Framework.Executor.API
         {
             try
             {
-                if (TestStep.ToExecute.ToLower().Contains("y"))
+                if (TestStep.ToExecute is not null && TestStep.ToExecute.ToLower().Contains("y"))
                     return true;
                 else
                     return false;
